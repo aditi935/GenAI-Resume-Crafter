@@ -1,0 +1,6 @@
+[theme]
+base="dark"
+primaryColor="#FF6700"                # Soft purple – elegant & creative
+backgroundColor="#0B0F19"             # Deep indigo – immersive
+secondaryBackgroundColor="#1C1F2B"    # Cool grey-blue – for cards/sidebar
+textColor="#EAEAEA"                   # Light grey – easy on the eyes
