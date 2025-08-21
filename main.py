@@ -80,10 +80,8 @@ def configure_api(api_key):
     """Configure the API and check if it's valid"""
     try:
         genai.configure(api_key=api_key)
-        # Try a simple operation to check the key
         genai.list_models()
         st.session_state.api_key_valid = True
-        # Initialize the model
         st.session_state.model = genai.GenerativeModel('gemini-1.5-flash')
         return True, "API key is valid"
     except Exception as e:
@@ -97,19 +95,14 @@ def configure_api(api_key):
 
 def check_api_key():
     """Check if we have a valid API key from env or user input"""
-    # First try to get from environment
     env_api_key = os.getenv("GOOGLE_API_KEY")
     if env_api_key:
         valid, message = configure_api(env_api_key)
         if valid:
             return True
         else:
-            # Only show API instructions if there's an error with the env key
             st.session_state.show_api_instructions = True
             return False
-    
-    # If no environment API key found, don't show instructions by default
-    # Only show when user actually tries to use AI features
     return False
 
 def show_api_key_input_in_sidebar():
@@ -120,9 +113,7 @@ def show_api_key_input_in_sidebar():
     with st.expander("How to Get Google API Key", expanded=False):
         st.markdown("""
         **Follow these steps to get your Google API Key:**
-        
         1. Go to [Google AI Studio](https://aistudio.google.com/welcome)
-        
         2. Signup/Signin with your google account
         3. Click on "Get API Key" in the navbar
         4. Create a new API key or copy an existing one
@@ -142,7 +133,6 @@ def show_api_key_input_in_sidebar():
         valid, message = configure_api(api_key)
         if valid:
             st.session_state.show_api_instructions = False
-            # Trigger optimization automatically
             st.session_state.auto_optimize = True
         else:
             st.error(message)
@@ -150,8 +140,6 @@ def show_api_key_input_in_sidebar():
     else:
         if st.session_state.user_api_key:
             st.info("API key not configured - Refresh the page again")
-    
-    # Add a manual optimize button when API key is valid
 def create_resume_pdf(resume_data):
     buffer = BytesIO()
     doc = SimpleDocTemplate(
@@ -523,7 +511,7 @@ def create_pdf_document(resume_data, is_resume=True):
             
             if isinstance(resume_data['skills'], dict):
                 for category, skills in resume_data['skills'].items():
-                    if skills:  # Only show category if there are skills
+                    if skills: 
                         elements.append(Paragraph(category.upper(), styles['SkillCategory']))
                         elements.append(Paragraph(", ".join(skills), styles['BodyText']))
                         elements.append(Spacer(1, 4))
@@ -619,19 +607,13 @@ def create_pdf_document(resume_data, is_resume=True):
 def create_docx_cover_letter(cover_letter_text):
     """Create a DOCX document for the cover letter"""
     doc = Document()
-    
-    # Set default font
     style = doc.styles['Normal']
     font = style.font
     font.name = 'Calibri'
     font.size = Pt(11)
-    
-    # Add cover letter content
     for paragraph in cover_letter_text.split('\n'):
         if paragraph.strip():
             doc.add_paragraph(paragraph)
-    
-    # Save to buffer
     buffer = BytesIO()
     doc.save(buffer)
     buffer.seek(0)
@@ -715,7 +697,6 @@ COVER LETTER:"""
         response = st.session_state.model.generate_content(prompt)
         return response.text
     except Exception as e:
-        # Handle API errors gracefully without showing detailed error
         error_msg = str(e).lower()
         if "api key" in error_msg or "400" in error_msg or "quota" in error_msg or "invalid" in error_msg:
             st.session_state.api_key_valid = False
@@ -748,7 +729,6 @@ FORMAT YOUR RESPONSE WITH THESE SECTIONS:
         response = st.session_state.model.generate_content(prompt)
         return response.text
     except Exception as e:
-        # Handle API errors gracefully without showing detailed error
         error_msg = str(e).lower()
         if "api key" in error_msg or "400" in error_msg or "quota" in error_msg or "invalid" in error_msg:
             st.session_state.api_key_valid = False
@@ -781,7 +761,6 @@ FORMAT YOUR RESPONSE WITH THESE SECTIONS:
         response = st.session_state.model.generate_content(prompt)
         return response.text
     except Exception as e:
-        # Handle API errors gracefully without showing detailed error
         error_msg = str(e).lower()
         if "api key" in error_msg or "400" in error_msg or "quota" in error_msg or "invalid" in error_msg:
             st.session_state.api_key_valid = False
@@ -813,7 +792,6 @@ INCLUDE THESE SECTIONS:
         response = st.session_state.model.generate_content(prompt)
         return response.text
     except Exception as e:
-        # Handle API errors gracefully without showing detailed error
         error_msg = str(e).lower()
         if "api key" in error_msg or "400" in error_msg or "quota" in error_msg or "invalid" in error_msg:
             st.session_state.api_key_valid = False
@@ -890,15 +868,13 @@ def work_experience_form():
 
     if 'reset_new_position_form' not in st.session_state:
         st.session_state.reset_new_position_form = False
-
-    # ✅ Reset logic BEFORE widgets are created
     if st.session_state.reset_new_position_form:
         st.session_state["new_job_title_input"] = ""
         st.session_state["new_company_input"] = ""
         st.session_state["new_dates_input"] = ""
         st.session_state["new_location_input"] = ""
         st.session_state["new_achievements_input"] = ""
-        st.session_state.reset_new_position_form = False  # Reset the flag
+        st.session_state.reset_new_position_form = False 
 
     with st.expander("Add New Position", expanded=False):
         cols = st.columns([1, 1])
@@ -924,11 +900,8 @@ def work_experience_form():
                     'location': new_location,
                     'achievements': [a.strip() for a in new_achievements.split('\n') if a.strip()]
                 })
-                # ✅ Set the reset flag and rerun
                 st.session_state.reset_new_position_form = True
                 st.rerun()
-
-    # Existing positions display logic (unchanged)
     for i, exp in enumerate(st.session_state.resume_data['work_experience']):
         with st.expander(f"{exp.get('job_title', 'Untitled')} at {exp.get('company', 'Unknown')}", expanded=False):
             cols = st.columns([1, 1])
@@ -973,7 +946,7 @@ def work_experience_form():
                     }
                     st.rerun()
             with cols[1]:
-                if st.button("❌ Remove", key=f"remove_{i}"):
+                if st.button("Remove", key=f"remove_{i}"):
                     st.session_state.resume_data['work_experience'].pop(i)
                     st.rerun()
 
@@ -988,7 +961,6 @@ def education_form():
     if 'reset_new_education_form' not in st.session_state:
         st.session_state.reset_new_education_form = False
 
-    # ✅ Reset logic BEFORE widgets are created
     if st.session_state.reset_new_education_form:
         st.session_state["new_degree"] = ""
         st.session_state["new_institution"] = ""
@@ -1013,7 +985,6 @@ def education_form():
                     'year': new_year,
                     'honors': new_honors
                 })
-                # ✅ Trigger the reset for next run
                 st.session_state.reset_new_education_form = True
                 st.rerun()
 
@@ -1054,7 +1025,7 @@ def education_form():
                     }
                     st.rerun()
             with cols[1]:
-                if st.button("❌ Remove", key=f"remove_edu_{i}"):
+                if st.button("Remove", key=f"remove_edu_{i}"):
                     st.session_state.resume_data['education'].pop(i)
                     st.rerun()
 
@@ -1102,7 +1073,6 @@ def projects_form():
     if 'reset_new_project_form' not in st.session_state:
         st.session_state.reset_new_project_form = False
 
-    # ✅ Reset fields before widgets are rendered
     if st.session_state.reset_new_project_form:
         st.session_state["new_project_name"] = ""
         st.session_state["new_project_desc"] = ""
@@ -1162,7 +1132,7 @@ def projects_form():
                     }
                     st.rerun()
             with cols[1]:
-                if st.button("❌ Remove", key=f"remove_proj_{i}"):
+                if st.button("Remove", key=f"remove_proj_{i}"):
                     st.session_state.resume_data['projects'].pop(i)
                     st.rerun()
 
@@ -1230,7 +1200,7 @@ def create_comparison_view(original, optimized):
         added_certs = optimized_certs - original_certs
         
         if added_certs:
-            st.warning(f"⚠️ The optimized resume added these certifications that weren't in the original: {', '.join(added_certs)}")
+            st.warning(f"⚠️The optimized resume added these certifications that weren't in the original: {', '.join(added_certs)}")
         else:
             st.success("✅ No new certifications were added to the optimized resume")
     
@@ -1274,7 +1244,7 @@ def create_comparison_view(original, optimized):
                                 st.write(f"{item.get('company', '')} | {item.get('dates', '')}")
                                 for ach in item.get('achievements', []):
                                     st.write(f"- {ach}")
-                            else:  # education
+                            else: 
                                 st.write(f"**{item.get('degree', '')}**")
                                 st.write(f"{item.get('institution', '')} | {item.get('year', '')}")
                                 if item.get('honors'):
@@ -1291,7 +1261,7 @@ def create_comparison_view(original, optimized):
                                 st.write(f"{item.get('company', '')} | {item.get('dates', '')}")
                                 for ach in item.get('achievements', []):
                                     st.write(f"- {ach}")
-                            else:  # education
+                            else: 
                                 st.write(f"**{item.get('degree', '')}**")
                                 st.write(f"{item.get('institution', '')} | {item.get('year', '')}")
                                 if item.get('honors'):
@@ -1360,8 +1330,6 @@ def main():
         layout="wide",
         initial_sidebar_state="expanded"
     )
-    
-    # Custom CSS styling with orange color scheme
     st.markdown("""
     <style>
         .main .block-container {
@@ -1450,7 +1418,6 @@ def main():
         }
     </style>
     """, unsafe_allow_html=True)
-
     st.title("𓂃🪶GenAI Resume Crafter")
     st.markdown(
         '<p style="color:#FF6700; font-size:1.3rem;">'
@@ -1458,14 +1425,8 @@ def main():
         '</p>',
         unsafe_allow_html=True
     )
-
-    # Initialize session state
     init_session_state()
-
-    # Check API key from environment
     check_api_key()
-
-    # Sidebar
     with st.sidebar:
         st.markdown('<div class="sidebar-section-title" style="color:#FF6700; font-size:1.5rem; padding-bottom:2px">Customize Your Resume</div>', unsafe_allow_html=True)
         with st.expander("Guide to use GenAI Resume Crafter", expanded=False):
@@ -1478,7 +1439,6 @@ def main():
         5. Review all tabs for output
         """)
      
-        # Checkboxes for sections
         st.session_state.selected_sections = []
         
         def create_checkbox(label, key, help_text):
@@ -1501,22 +1461,13 @@ def main():
         create_checkbox("Projects", "projects_check", "Include projects section")
         create_checkbox("Certifications", "certs_check", "Include certifications section")
 
-        # Show API key input only when there's an error
         if st.session_state.show_api_instructions:
             show_api_key_input_in_sidebar()
         
         st.markdown("---")
         st.header("Actions")
-
-        # Toggle for default data
-        st.session_state.use_default_data = st.toggle(
-            "Use Sample Data", 
-            value=st.session_state.use_default_data,
-            help="Toggle to fill form with sample data for testing"
-        )
         
         if st.session_state.use_default_data:
-            # Fill with sample data
             sample_data = {
                 'contact_info': {
                     'name': 'John Doe',
@@ -1562,7 +1513,6 @@ def main():
                 ]
             }
             
-            # Only update if data is empty to avoid overwriting user input
             for key in sample_data:
                 if not st.session_state.resume_data.get(key) or (
                     isinstance(st.session_state.resume_data.get(key), (dict, list)) and 
@@ -1581,7 +1531,6 @@ def main():
             if not st.session_state.company_name:
                 st.session_state.company_name = "Innovative Tech Solutions"
 
-        # Action buttons in columns
         cols = st.columns(2)
         with cols[0]:
             if st.button("Optimize Resume", use_container_width=True, type="primary"):
@@ -1674,7 +1623,6 @@ def main():
                 init_session_state()
                 st.rerun()
 
-        # Download button in sidebar after optimization
         if st.session_state.optimized_resume:
             st.markdown("---")
             st.subheader("Download")
@@ -1687,9 +1635,6 @@ def main():
                 use_container_width=True
             )
 
-        
-
-    # Automatic optimization when API key is validated
     if st.session_state.auto_optimize and st.session_state.api_key_valid:
         st.session_state.auto_optimize = False
         
@@ -1757,8 +1702,6 @@ def main():
                 st.rerun()
         else:
             st.warning("Please fill in your name, target role, and job description")
-
-    # Tabs
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "Resume Builder", 
         "Optimized Resume", 
@@ -1784,30 +1727,6 @@ def main():
             projects_form()
         if "Certifications" in st.session_state.selected_sections:
             certifications_form()
-        
-        # if st.session_state.optimized_resume:
-        #     st.markdown("---")
-        #     st.subheader("📄 Download Options")
-        #     cols = st.columns(2)
-        #     with cols[0]:
-        #         pdf_buffer = create_pdf_document(st.session_state.optimized_resume, is_resume=True)
-        #         st.download_button(
-        #             label="📥 Download Optimized Resume (PDF)",
-        #             data=pdf_buffer,
-        #             file_name=f"optimized_resume_{st.session_state.optimized_resume['contact_info']['name'].replace(' ', '_')}.pdf",
-        #             mime="application/pdf",
-        #             use_container_width=True
-        #         )
-        #     with cols[1]:
-        #         if st.session_state.cover_letter:
-        #             cover_docx_buffer = create_docx_cover_letter(st.session_state.cover_letter)
-        #             st.download_button(
-        #                 label="📥 Download Cover Letter (DOCX)",
-        #                 data=cover_docx_buffer,
-        #                 file_name=f"cover_letter_{st.session_state.company_name or 'application'}.docx",
-        #                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        #                 use_container_width=True
-        #             )
     
     with tab2:
         if st.session_state.optimized_resume is None:
@@ -1831,12 +1750,9 @@ def main():
     with tab3:
         if st.session_state.cover_letter:
             st.subheader("Generated Cover Letter")
-        
-        # Create two equal columns
             col1, col2 = st.columns(2)
         
             with col1:
-            # Cover Letter Container
                 st.markdown("""
             <style>
                 .scroll-container {
@@ -1874,7 +1790,6 @@ def main():
             )
 
             with col2:
-    # ATS Analysis Container
                   st.markdown("""
     <style>
         .scroll-container-ats {
@@ -1903,16 +1818,6 @@ def main():
         f'<div class="scroll-container-ats">{st.session_state.cover_letter_ats}</div>',
         unsafe_allow_html=True
     )
-
-            
-            # Optional download button for ATS report
-            # st.download_button(
-            #     label="📄 Download ATS Report",
-            #     data=st.session_state.cover_letter_ats,
-            #     file_name="ats_analysis_report.txt",
-            #     mime="text/plain",
-            #     use_container_width=True
-            # )
             
         else:
             st.info("Optimize your resume to generate a cover letter")
