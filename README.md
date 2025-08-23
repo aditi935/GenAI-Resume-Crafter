@@ -6,6 +6,13 @@ Unlike traditional resume builders 📄 that only format resumes, **GenAI Resume
 
 ---
 
+
+## 🎥 Demo Video
+[▶ Click here to see workflow and understand how the project works](https://www.youtube.com/watch?v=oEbq2WVxmVk)
+
+
+---
+
 ## 🚀 Why GenAI Resume Crafter?
 
 ### 🔹 How is it different from existing solutions?  
@@ -16,12 +23,6 @@ Unlike traditional resume builders 📄 that only format resumes, **GenAI Resume
 👉 **GenAI Resume Crafter is different:**  
 - 🔍 Combines **resume optimization, ATS analysis, skill gap insights, and interview prep** in one platform.  
 - 🌟 Not just a resume builder → **a complete AI career assistant powered by Google Gemini AI**.  
-
----
-
-## 🎥 Demo Video
-[▶ Click here to see workflow and understand how the project works](https://www.youtube.com/watch?v=oEbq2WVxmVk)
-
 
 ---
 
