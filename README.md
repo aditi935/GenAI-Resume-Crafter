@@ -19,6 +19,12 @@ Unlike traditional resume builders 📄 that only format resumes, **GenAI Resume
 
 ---
 
+## 🎥 Demo Video
+[▶ Click here to see workflow and understand how the project works](https://www.youtube.com/watch?v=oEbq2WVxmVk)
+
+
+---
+
 ## 🛠 How does it solve the problem?
 
 - 📝 **Resume Optimization** → Converts raw details into a polished, ATS-friendly resume.  
